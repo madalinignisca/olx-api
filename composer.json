@@ -1,18 +1,18 @@
 {
-    "name": ":vendor/:package_name",
+    "name": "madalinignisca/olx-api",
     "type": "library",
-    "description": ":package_description",
+    "description": "OLX Api",
     "keywords": [
-        ":vendor",
-        ":package_name"
+        "madalinignisca",
+        "olx-api"
     ],
-    "homepage": "https://github.com/:vendor/:package_name",
+    "homepage": "https://github.com/madalinignisca/olx-api",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "homepage": ":author_website",
+            "name": "Mădălin Ignișca",
+            "email": "hi@madalin.me",
+            "homepage": "https://madalin.me",
             "role": "Developer"
         }
     ],
@@ -25,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            ":vendor\\:package_name\\": "src"
+            "MadalinIgnisca\\Olx\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            ":vendor\\:package_name\\": "tests"
+            "MadalinIgnisca\\Olx\\": "tests"
         }
     },
     "scripts": {

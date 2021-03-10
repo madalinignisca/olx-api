@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace League\Skeleton;
+namespace MadalinIgnisca\Olx;
 
 class ExampleTest extends \PHPUnit\Framework\TestCase
 {

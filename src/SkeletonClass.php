@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace League\Skeleton;
+namespace MadalinIgnisca\Olx;
 
-class SkeletonClass
+class Olx
 {
     /**
      * Create a new Skeleton Instance
@@ -12,17 +12,5 @@ class SkeletonClass
     public function __construct()
     {
         // constructor body
-    }
-
-    /**
-     * Friendly welcome
-     *
-     * @param string $phrase Phrase to return
-     *
-     * @return string Returns the phrase passed in
-     */
-    public function echoPhrase(string $phrase): string
-    {
-        return $phrase;
     }
 }
