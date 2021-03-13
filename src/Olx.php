@@ -30,7 +30,6 @@ class Olx
             'timeout'  => 2.0,
             'headers' => [
                 'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
                 'Authorization' => $authorization,
                 'X-API-KEY' => $apiKey,
                 'User-Agent' => $userAgent
@@ -86,6 +85,27 @@ class Olx
 
         $body = json_decode($response->getBody());
 
-        return new AccessToken(...$body);
+        return new AccessToken(...array_values($body));
+    }
+
+    // PROFILE
+    public function getProfilePackages(string $token_type, string $access_token)
+    {
+        try {
+            $response = $this->client->request('GET', '/profile/v1/packages', [
+                'headers' => [
+                    "Authorization" => $token_type . ' ' . $access_token,
+                ]
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return new AccessToken(...current(array_values(($body->data))));
     }
 }
