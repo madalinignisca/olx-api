@@ -4,32 +4,49 @@ declare(strict_types=1);
 
 namespace MadalinIgnisca\Olx;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\RequestException;
+
 class Olx
 {
-    protected $apiKey;
-    protected $clientId;
-    protected $clientSecret;
+    protected $client;
 
     /**
-     * Create a new Skeleton Instance
+     * Create a new Olx Instance
      */
     public function __construct(
         string $apiKey,
         string $clientId,
         string $clientSecret,
-        string $userAgent,
-        string $portalSite
+        string $userAgent
     ) {
-        $this->apiKey = $apiKey;
-        $this->clientId = $clientId;
-        $this->clientSecret = $clientSecret;
+        $authorization = 'Basic ' . base64_encode($clientId . ':' . $clientSecret);
+
+        $this->client = new Client([
+            // Base URI is used with relative requests
+            'base_uri' => 'https://api.olxgroup.com',
+            // You can set any number of default request options.
+            'timeout'  => 2.0,
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => $authorization,
+                'X-API-KEY' => $apiKey,
+                'User-Agent' => $userAgent
+                ]
+        ]);
     }
 
     /**
      * Get Authorization URL
      *
-     * string @portalSite
-     * string @userId
+     * Given the portal site and user identification id
+     * will return a code mandatory to be used within 60s
+     *
+     * @param string $portalSite
+     * @param string $userId
+     * @return string
      */
     public function authorizationUrl(string $portalSite, string $userId): string
     {
@@ -41,9 +58,34 @@ class Olx
 
     /**
      * Get access token
+     *
+     * Authorization code TTL
+     * Don't forget that the authorization code only lasts 60 seconds.
+     * You must request the access token within this timeframe.
+     * Otherwise, the user will have to grant your app permissions again.
+     * https://developer.olxgroup.com/docs/authorization-flow#3-exchange-code-for-an-access-token
+     *
+     * @param string $authorizationCode
+     * @return AccessToken
      */
-    public function getToken(string $authorizationCode)
+    public function getAccessToken(string $authorizationCode)
     {
-        // http to https://api.olxgroup.com/oauth/v1/token
+        try {
+            $response = $this->client->request('POST', '/oauth/v1/token', [
+                'json' => [
+                    "grant_type" => "authorization_code",
+                    "code" => $authorizationCode,
+                ]
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return new AccessToken(...$body);
     }
 }
