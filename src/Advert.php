@@ -85,4 +85,9 @@ class Advert
     {
         $this->parent_uuid = $parent->getUuid();
     }
+
+    public function setImages(ImageCollection $images)
+    {
+        $this->images = $images->getImages();
+    }
 }
