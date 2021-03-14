@@ -6,6 +6,8 @@ namespace MadalinIgnisca\Olx;
 
 class Advert
 {
+    // declared properties are required by Olx
+    // optionals can be set on the fly with corresponding methods
     public $title;
     public $description;
     public $site_urn;
@@ -14,7 +16,7 @@ class Advert
     public $price;
     public $location;
     public $images;
-    public $movie_url;
+    public $attributes = [];
 
     public function __construct(string $title, string $description)
     {
@@ -42,6 +44,23 @@ class Advert
         $this->price = $price;
     }
 
+    // otodom
+    public function setRentPrice(Price $price)
+    {
+        $this->rent_price = $price;
+    }
+
+    // otodom
+    public function setDepositPrice(Price $price)
+    {
+        $this->deposit_price = $price;
+    }
+
+    public function setMarket(Market $market)
+    {
+        $this->market = $market->getType;
+    }
+
     public function setLocation(Location $location)
     {
         $this->location = $location;
@@ -60,5 +79,10 @@ class Advert
     public function setCustomFields(CustomFields $fields)
     {
         $this->custom_fields = $fields;
+    }
+
+    public function setParent(Investment $parent)
+    {
+        $this->parent_uuid = $parent->getUuid();
     }
 }
