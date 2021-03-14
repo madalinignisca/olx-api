@@ -16,7 +16,7 @@ class Advert
     public $price;
     public $location;
     public $images;
-    public $attributes = [];
+    public $attributes;
 
     public function __construct(string $title, string $description)
     {
@@ -71,9 +71,9 @@ class Advert
         $this->movie_url = $url;
     }
 
-    public function addAttribute(Attribute $attribute)
+    public function addAttributes(AttributeCollection $attributes)
     {
-        $this->attributes[] = $attribute;
+        $this->attributes = $attributes;
     }
 
     public function setCustomFields(CustomFields $fields)

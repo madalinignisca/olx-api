@@ -12,4 +12,9 @@ class AttributeCollection
     {
         $this->collection[] = $attribute;
     }
+
+    public function getAttributes()
+    {
+        return $this->collection;
+    }
 }
