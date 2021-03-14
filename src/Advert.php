@@ -81,6 +81,7 @@ class Advert
         $this->custom_fields = $fields;
     }
 
+    // to see how is used with Investments...
     public function setParent(Investment $parent)
     {
         $this->parent_uuid = $parent->getUuid();
