@@ -230,6 +230,35 @@ class Olx
     }
 
     /**
+     * Delete an advert
+     *
+     * @param string $uuid
+     * @param string $token
+     * @return string
+     */
+    public function deleteAdvert(string $uuid, string $token)
+    {
+        try {
+            $response = $this->client->request('DELETE', '/advert/v1/' . $uuid, [
+                'headers' => [
+                    "Authorization" => 'Bearer ' . $token,
+                    "Content-Type" => "application/json",
+                ],
+                'json' => $advert
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return $body->message;
+    }
+
+    /**
      * Deactivates an advert
      *
      * @param string $uuid
