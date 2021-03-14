@@ -200,6 +200,36 @@ class Olx
     }
 
     /**
+     * Updates an advert
+     *
+     * @param string $uuid
+     * @param Advert $advert
+     * @param string $token
+     * @return string
+     */
+    public function updateAdvert(string $uuid, Advert $advert, string $token): string
+    {
+        try {
+            $response = $this->client->request('PUT', '/advert/v1/' . $uuid, [
+                'headers' => [
+                    "Authorization" => 'Bearer ' . $token,
+                    "Content-Type" => "application/json",
+                ],
+                'json' => $advert
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return $body->message;
+    }
+
+    /**
      * Deactivates an advert
      *
      * @param string $uuid
