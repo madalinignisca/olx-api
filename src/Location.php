@@ -8,11 +8,15 @@ class Location
 {
     public function __construct(
         float $latitude,
-        float $longitute,
-        bool $exact = false
+        float $longitude,
+        bool $exact = false,
+        string $postal_code = null
     ) {
         $this->lat = $latitude;
-        $this->lon = $longitute;
+        $this->lon = $longitude;
         $this->exact = $exact;
+        if ($postal_code) {
+            $this->postal_code = $postal_code;
+        }
     }
 }
