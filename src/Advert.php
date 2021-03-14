@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace MadalinIgnisca\Olx;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Request;
-
 class Advert
 {
-    protected $client;
-    protected $request;
-    protected $category_urn;
+    public $title;
+    public $description;
+    public $site_urn;
+    public $category_urn;
+    public $contact;
+    public $price;
+    public $location;
+    public $images;
+    public $movie_url;
 
-    public function __construct(Client $client, string $token)
+    public function __construct(string $title, string $description)
     {
-        $this->client = $client;
-        $this->request = new Request('POST', '/advert/v1', [
-            'headers' => [
-                'Authorization' => $token,
-            ]
-        ]);
+        $this->title = $title;
+        $this->description = $description;
     }
 
-    public function setSiteUrn(string $urn)
+    public function setSite(string $urn)
     {
         $this->site_urn = $urn;
     }
@@ -61,19 +60,5 @@ class Advert
     public function setCustomFields(CustomFields $fields)
     {
         $this->custom_fields = $fields;
-    }
-
-    public function publish()
-    {
-        try {
-            $response = $this->send($this->request, [
-                'body' => $data,
-            ]);
-        } catch (RequestException $e) {
-            echo Psr7\Message::toString($e->getRequest());
-            if ($e->hasResponse()) {
-                echo Psr7\Message::toString($e->getResponse());
-            }
-        }
     }
 }
