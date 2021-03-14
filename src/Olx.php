@@ -17,12 +17,10 @@ class Olx
      */
     public function __construct(
         string $apiKey,
+        string $userAgent,
         string $clientId,
-        string $clientSecret,
-        string $userAgent
+        string $clientSecret
     ) {
-        $authorization = 'Basic ' . base64_encode($clientId . ':' . $clientSecret);
-
         $this->client = new Client([
             // Base URI is used with relative requests
             'base_uri' => 'https://api.olxgroup.com',
@@ -30,11 +28,13 @@ class Olx
             'timeout'  => 2.0,
             'headers' => [
                 'Accept' => 'application/json',
-                'Authorization' => $authorization,
                 'X-API-KEY' => $apiKey,
                 'User-Agent' => $userAgent
                 ]
         ]);
+
+        $this->clientId = $clientId;
+        $this->clientSecret = $clientSecret;
     }
 
     /**
@@ -71,6 +71,9 @@ class Olx
     {
         try {
             $response = $this->client->request('POST', '/oauth/v1/token', [
+                'headers' => [
+                    'Authorization' => 'Basic ' . $this->calculateAppAuthorization(),
+                ],
                 'json' => [
                     "grant_type" => "authorization_code",
                     "code" => $authorizationCode,
@@ -88,13 +91,42 @@ class Olx
         return new AccessToken(...array_values($body));
     }
 
+    public function refreshAccessToken(string $refresh_token)
+    {
+        try {
+            $response = $this->client->request('POST', '/oauth/v1/token', [
+                'headers' => [
+                    'Authorization' => 'Basic ' . $this->calculateAppAuthorization(),
+                ],
+                'json' => [
+                    "grant_type" => "refresh_token",
+                    "refresh_token" => $refresh_token,
+                ]
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return new AccessToken(...array_values($body));
+    }
+
+    public function calculateAppAuthorization()
+    {
+        return 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret);
+    }
+
     // PROFILE
-    public function getProfilePackages(string $token_type, string $access_token)
+    public function getProfilePackages(string $token)
     {
         try {
             $response = $this->client->request('GET', '/profile/v1/packages', [
                 'headers' => [
-                    "Authorization" => $token_type . ' ' . $access_token,
+                    "Authorization" => 'Bearer ' . $token,
                 ]
             ]);
         } catch (RequestException $e) {
@@ -107,5 +139,121 @@ class Olx
         $body = json_decode($response->getBody());
 
         return new AccessToken(...current(array_values(($body->data))));
+    }
+
+    /**
+     * Posts an advert
+     *
+     * @param Advert $advert
+     * @param string $token
+     * @return string
+     */
+    public function postAdvert(Advert $advert, string $token): string
+    {
+        try {
+            $response = $this->client->request('POST', '/advert/v1', [
+                'headers' => [
+                    "Authorization" => 'Bearer ' . $token,
+                    "Content-Type" => "application/json",
+                ],
+                'json' => $advert
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return $body->uuid;
+    }
+
+    /**
+     * Validates an advert
+     *
+     * @param Advert $advert
+     * @param string $token
+     * @return string
+     */
+    public function validateAdvert(Advert $advert, string $token): string
+    {
+        try {
+            $response = $this->client->request('POST', '/advert/v1/validate', [
+                'headers' => [
+                    "Authorization" => 'Bearer ' . $token,
+                    "Content-Type" => "application/json",
+                ],
+                'json' => $advert
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return $body->message;
+    }
+
+    /**
+     * Deactivates an advert
+     *
+     * @param string $uuid
+     * @param string $token
+     * @return string
+     */
+    public function deActivateAdvert(string $uuid, string $token)
+    {
+        try {
+            $response = $this->client->request('POST', '/advert/v1/' . $uuid . '/deactivate', [
+                'headers' => [
+                    "Authorization" => 'Bearer ' . $token,
+                    "Content-Type" => "application/json",
+                ],
+                'json' => $advert
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return $body->message;
+    }
+
+    /**
+     * Activates an advert
+     *
+     * @param string $uuid
+     * @param string $token
+     * @return string
+     */
+    public function activateAdvert(string $uuid, string $token)
+    {
+        try {
+            $response = $this->client->request('POST', '/advert/v1/' . $uuid . '/activate', [
+                'headers' => [
+                    "Authorization" => 'Bearer ' . $token,
+                    "Content-Type" => "application/json",
+                ],
+                'json' => $advert
+            ]);
+        } catch (RequestException $e) {
+            echo Psr7\Message::toString($e->getRequest());
+            if ($e->hasResponse()) {
+                echo Psr7\Message::toString($e->getResponse());
+            }
+        }
+
+        $body = json_decode($response->getBody());
+
+        return $body->message;
     }
 }
